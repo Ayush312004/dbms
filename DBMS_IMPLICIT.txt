@@ -1,0 +1,24 @@
+CREATE TABLE accounts (
+acc_no INT PRIMARY KEY,
+  holder_name VARCHAR(100),
+        balance DECIMAL(12,2));
+INSERT INTO accounts (acc_no, holder_name, balance) VALUES
+     (101, 'Rahul', 5000.00), (102, 'Priya', 8000.00), (103, 'Amit', 12000.00);
+DELIMITER $$
+CREATE PROCEDURE deposit_amount()
+BEGIN
+DECLARE v_deposit DECIMAL(12,2) DEFAULT 2000.00;
+DECLARE v_account INT DEFAULT 102;
+   UPDATE accounts
+SET balance = balance + v_deposit
+WHERE acc_no = v_account;
+SELECT CONCAT('Rows Updated: ', ROW_COUNT()) AS result;
+SELECT acc_no, holder_name, balance
+FROM accounts
+WHERE acc_no = v_account;
+ END$$
+DELIMITER ;
+CALL deposit_amount();
+
+
+

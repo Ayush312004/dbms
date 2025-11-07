@@ -1,0 +1,10 @@
+SET @m = 85;
+
+SELECT
+  CASE
+    WHEN @m < 0 OR @m > 100 THEN 'Invalid Marks! Please enter marks between 0 and 100.'
+    WHEN @m >= 75 THEN 'Distinction'
+    WHEN @m >= 60 THEN 'First Class'
+    WHEN @m >= 50 THEN 'Second Class'
+    ELSE 'Fail'
+  END AS Result;

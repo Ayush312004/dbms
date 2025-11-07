@@ -1,0 +1,77 @@
+CREATE TABLE Doctors (
+  DoctorID INT PRIMARY KEY,
+  Name VARCHAR(100),
+  Specialty VARCHAR(100)
+);
+
+CREATE TABLE Patients (
+  PatientID INT PRIMARY KEY,
+  Name VARCHAR(100),
+  Age INT,
+  City VARCHAR(50)
+);
+
+CREATE TABLE Appointments (
+  ApptID INT PRIMARY KEY,
+  DoctorID INT,
+  PatientID INT,
+  ApptDate DATE,
+  Remarks VARCHAR(255),
+  FOREIGN KEY (DoctorID) REFERENCES Doctors(DoctorID),
+  FOREIGN KEY (PatientID) REFERENCES Patients(PatientID)
+);
+
+
+INSERT INTO Doctors VALUES
+(1,'Dr. Mehta','Cardiology'),
+(2,'Dr. Rao','Orthopedics'),
+(3,'Dr. Singh','General');
+
+INSERT INTO Patients VALUES
+(101,'Asha Patel',65,'Mumbai'),
+(102,'Vikram Joshi',45,'Pune'),
+(103,'Neha Kulkarni',30,'Mumbai'),
+(104,'Ramesh Iyer',72,'Chennai');
+
+INSERT INTO Appointments VALUES
+(1001,1,101,'2025-10-01','follow-up'),
+(1002,1,102,'2025-10-05','new'),
+(1003,1,103,'2025-10-10','checkup'),
+(1004,2,103,'2025-10-12','x-ray'),
+(1005,1,104,'2025-09-20','consult'),
+(1006,3,102,'2025-10-18','general'),
+(1007,1,102,'2025-10-20','repeat');
+
+
+SELECT d.DoctorID, d.Name,
+       COUNT(DISTINCT a.PatientID) AS PatientsSeen
+FROM Doctors d
+LEFT JOIN Appointments a ON d.DoctorID = a.DoctorID
+GROUP BY d.DoctorID, d.Name;
+
+
+SELECT * FROM Patients
+ORDER BY Age DESC;
+
+
+SELECT d.DoctorID, d.Name, COUNT(*) AS ApptCount
+FROM Doctors d
+JOIN Appointments a ON d.DoctorID = a.DoctorID
+GROUP BY d.DoctorID, d.Name
+HAVING COUNT(*) > 3;
+
+
+SELECT DISTINCT p.PatientID, p.Name, p.Age, p.City
+FROM Patients p
+JOIN Appointments a ON p.PatientID = a.PatientID
+JOIN Doctors d ON a.DoctorID = d.DoctorID
+WHERE d.Name = 'Dr. Mehta';
+
+
+DELETE FROM Appointments
+WHERE PatientID IN (
+  SELECT PatientID FROM Patients WHERE Age > 60
+);
+
+
+

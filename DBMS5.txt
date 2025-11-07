@@ -1,0 +1,98 @@
+CREATE TABLE Hotels (
+  HotelID INT PRIMARY KEY,
+  Name VARCHAR(100),
+  City VARCHAR(50)
+);
+
+CREATE TABLE Rooms (
+  RoomID INT PRIMARY KEY,
+  HotelID INT,
+  RoomNumber VARCHAR(20),
+  Price DECIMAL(10,2),
+  Status VARCHAR(20),   -- 'available' or 'booked'
+  FOREIGN KEY (HotelID) REFERENCES Hotels(HotelID)
+);
+
+CREATE TABLE Guests (
+  GuestID INT PRIMARY KEY,
+  Name VARCHAR(100),
+  City VARCHAR(50)
+);
+
+CREATE TABLE Reservations (
+  ResID INT PRIMARY KEY,
+  RoomID INT,
+  GuestID INT,
+  CheckIn DATE,
+  CheckOut DATE,
+  Status VARCHAR(20),   -- 'booked', 'checked_in', 'cancelled'
+  FOREIGN KEY (RoomID) REFERENCES Rooms(RoomID),
+  FOREIGN KEY (GuestID) REFERENCES Guests(GuestID)
+);
+
+
+INSERT INTO Hotels VALUES
+(1,'SeaView Resort','Goa'),
+(2,'City Inn','Mumbai'),
+(3,'Hilltop Hotel','Goa');
+
+INSERT INTO Rooms VALUES
+(101,1,'A101',8000.00,'available'),
+(102,1,'A102',9000.00,'booked'),
+(103,1,'A103',9500.00,'booked'),
+(104,1,'A104',7000.00,'booked'),
+(201,2,'B201',6000.00,'booked'),
+(202,2,'B202',6500.00,'available'),
+(301,3,'C301',12000.00,'booked');
+
+INSERT INTO Guests VALUES
+(1,'Amit Sharma','Mumbai'),
+(2,'Priya Singh','Delhi'),
+(3,'Rahul Desai','Pune');
+
+INSERT INTO Reservations VALUES
+(1,102,1,'2025-10-01','2025-10-05','booked'),
+(2,103,2,'2025-10-02','2025-10-06','booked'),
+(3,104,3,'2025-10-03','2025-10-07','booked'),
+(4,201,1,'2025-10-04','2025-10-06','booked'),
+(5,301,2,'2025-10-10','2025-10-12','booked');
+
+
+SELECT h.HotelID, h.Name,
+       COUNT(DISTINCT rm.RoomID) AS RoomsBooked
+FROM Hotels h
+JOIN Rooms rm ON rm.HotelID = h.HotelID
+JOIN Reservations r ON r.RoomID = rm.RoomID AND r.Status = 'booked'
+GROUP BY h.HotelID, h.Name
+HAVING COUNT(DISTINCT rm.RoomID) > 3;
+
+
+SELECT * FROM Rooms
+ORDER BY Price DESC;
+
+
+SELECT h.HotelID, h.Name,
+       COUNT(DISTINCT rm.RoomID) AS RoomsBooked
+FROM Hotels h
+JOIN Rooms rm ON rm.HotelID = h.HotelID
+JOIN Reservations r ON r.RoomID = rm.RoomID AND r.Status = 'booked'
+GROUP BY h.HotelID, h.Name;
+
+
+SELECT DISTINCT g.GuestID, g.Name
+FROM Guests g
+JOIN Reservations r ON g.GuestID = r.GuestID AND r.Status = 'booked'
+JOIN Rooms rm ON r.RoomID = rm.RoomID
+WHERE rm.HotelID = (
+  SELECT HotelID
+  FROM Rooms
+  GROUP BY HotelID
+  ORDER BY MAX(Price) DESC
+  LIMIT 1
+);
+
+
+SELECT rm.*
+FROM Rooms rm
+JOIN Hotels h ON rm.HotelID = h.HotelID
+WHERE h.City = 'Goa' AND rm.Status = 'available';

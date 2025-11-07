@@ -1,0 +1,61 @@
+CREATE TABLE Customers (
+  CustomerID INT PRIMARY KEY,
+  Name VARCHAR(100),
+  City VARCHAR(50)
+);
+
+CREATE TABLE Accounts (
+  AccountID INT PRIMARY KEY,
+  CustomerID INT,
+  AccountType VARCHAR(20),
+  Balance DECIMAL(12,2),
+  FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID)
+);
+
+CREATE TABLE Transactions (
+  TransID INT PRIMARY KEY,
+  AccountID INT,
+  TransType VARCHAR(20),
+  Amount DECIMAL(12,2),
+  TransDate DATE,
+  FOREIGN KEY (AccountID) REFERENCES Accounts(AccountID)
+);
+
+
+INSERT INTO Customers VALUES
+(1,'Amit','Mumbai'),
+(2,'Priya','Pune'),
+(3,'Rahul','Mumbai');
+
+INSERT INTO Accounts VALUES
+(101,1,'Savings',8000),
+(102,2,'Current',12000),
+(103,3,'Savings',15000);
+
+INSERT INTO Transactions VALUES
+(1,101,'Deposit',2000,'2025-10-01'),
+(2,101,'Withdraw',500,'2025-10-20'),
+(3,102,'Deposit',3000,'2025-10-25'),
+(4,103,'Withdraw',1000,'2025-10-10');
+
+SELECT a.AccountType, SUM(t.Amount) AS TotalDeposits
+FROM Accounts a
+JOIN Transactions t ON a.AccountID=t.AccountID
+WHERE t.TransType='Deposit'
+GROUP BY a.AccountType;
+
+SELECT * FROM Transactions ORDER BY TransDate DESC;
+
+
+SELECT c.Name, a.Balance
+FROM Customers c JOIN Accounts a ON c.CustomerID=a.CustomerID
+WHERE a.Balance > (SELECT AVG(Balance) FROM Accounts);
+
+
+SELECT * FROM Customers WHERE City='Mumbai';
+
+
+DELETE FROM Transactions
+WHERE TransDate < (CURRENT_DATE - INTERVAL '30' DAY);
+
+

@@ -1,0 +1,64 @@
+CREATE TABLE Customers (CustomerID INT PRIMARY KEY, Name VARCHAR(50));
+CREATE TABLE Employees (EmpID INT PRIMARY KEY, Name VARCHAR(50), ManagerID INT);
+CREATE TABLE Products (ProductID INT PRIMARY KEY, Name VARCHAR(50), Price DECIMAL(10,2));
+CREATE TABLE Orders (OrderID INT PRIMARY KEY, CustomerID INT, EmpID INT, OrderDate DATE);
+CREATE TABLE OrderItems (OrderItemID INT PRIMARY KEY, OrderID INT, ProductID INT, Qty INT, PriceAtOrder DECIMAL(10,2));
+
+INSERT INTO Customers VALUES (1,'Aisha'),(2,'Ben'),(3,'Cara');
+INSERT INTO Employees VALUES (10,'Ravi',NULL),(11,'Maya',10),(12,'John',10);
+INSERT INTO Products VALUES (100,'Laptop',60000),(101,'Mouse',800),(102,'Bag',1500);
+INSERT INTO Orders VALUES (1000,1,11,'2025-10-01'),(1001,2,12,'2025-10-05');
+INSERT INTO OrderItems VALUES (1,1000,100,1,60000),(2,1000,101,2,800),(3,1001,102,1,1500);
+
+
+SELECT c.CustomerID, c.Name, o.OrderID
+FROM Customers c
+JOIN Orders o ON c.CustomerID = o.CustomerID;
+
+
+SELECT c.CustomerID, c.Name, o.OrderID
+FROM Customers c
+LEFT JOIN Orders o ON c.CustomerID = o.CustomerID;
+
+
+SELECT o.OrderID, o.OrderDate, c.CustomerID, c.Name
+FROM Orders o
+RIGHT JOIN Customers c ON o.CustomerID = c.CustomerID;
+
+
+SELECT c.CustomerID, c.Name, o.OrderID
+FROM Customers c
+FULL OUTER JOIN Orders o ON c.CustomerID = o.CustomerID;
+
+
+SELECT c.Name AS Customer, p.Name AS Product
+FROM Customers c
+CROSS JOIN Products p;
+
+
+SELECT e.EmpID AS EmployeeID, e.Name AS Employee, m.EmpID AS ManagerID, m.Name AS Manager
+FROM Employees e
+LEFT JOIN Employees m ON e.ManagerID = m.EmpID;
+
+
+SELECT o.OrderID, c.Name AS Customer, p.Name AS Product, oi.Qty, oi.PriceAtOrder
+FROM Orders o
+JOIN Customers c ON o.CustomerID = c.CustomerID
+JOIN OrderItems oi ON o.OrderID = oi.OrderID
+JOIN Products p ON oi.ProductID = p.ProductID;
+
+
+SELECT o.OrderID, oi.ProductID, oi.Qty
+FROM Orders o
+JOIN OrderItems oi USING (OrderID);
+
+
+SELECT DISTINCT c.CustomerID, c.Name
+FROM Customers c
+JOIN Orders o ON c.CustomerID = o.CustomerID
+JOIN OrderItems oi ON o.OrderID = oi.OrderID
+JOIN Products p ON oi.ProductID = p.ProductID
+WHERE p.Name = 'Laptop';
+
+
+		

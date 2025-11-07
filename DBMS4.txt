@@ -1,0 +1,81 @@
+CREATE TABLE Products (
+  ProductID INT PRIMARY KEY,
+  Name VARCHAR(100),
+  Category VARCHAR(100),
+  Price DECIMAL(12,2)
+);
+
+CREATE TABLE Customers (
+  CustomerID INT PRIMARY KEY,
+  Name VARCHAR(100),
+  Email VARCHAR(100),
+  City VARCHAR(50)
+);
+
+CREATE TABLE Orders (
+  OrderID INT PRIMARY KEY,
+  CustomerID INT,
+  OrderDate DATE,
+  FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID)
+);
+
+CREATE TABLE OrderItems (
+  OrderItemID INT PRIMARY KEY,
+  OrderID INT,
+  ProductID INT,
+  Quantity INT,
+  PriceAtOrder DECIMAL(12,2),
+  FOREIGN KEY (OrderID) REFERENCES Orders(OrderID),
+  FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+);
+
+
+INSERT INTO Products VALUES
+(1,'Laptop','Electronics',60000),
+(2,'Mouse','Electronics',800),
+(3,'T-shirt','Apparel',500),
+(4,'Coffee Maker','Home Appliances',3500);
+
+INSERT INTO Customers VALUES
+(1,'Amit Sharma','amit@example.com','Mumbai'),
+(2,'Priya Singh','priya@example.com','Delhi');
+
+INSERT INTO Orders VALUES
+(100,1,'2025-10-01'),
+(101,2,'2025-10-05');
+
+INSERT INTO OrderItems VALUES
+(1,100,1,1,60000),   -- Amit bought 1 Laptop
+(2,100,2,2,800),     -- Amit bought 2 Mice
+(3,101,3,3,500);     -- Priya bought 3 T-shirts
+
+
+SELECT DISTINCT c.CustomerID, c.Name, c.Email
+FROM Customers c
+JOIN Orders o ON c.CustomerID = o.CustomerID
+JOIN OrderItems oi ON o.OrderID = oi.OrderID
+JOIN Products p ON oi.ProductID = p.ProductID
+WHERE p.Name = 'Laptop';
+
+
+SELECT * FROM Products
+ORDER BY Price DESC;
+
+
+SELECT p.Category,
+       SUM(oi.Quantity * oi.PriceAtOrder) AS TotalSales
+FROM Products p
+JOIN OrderItems oi ON p.ProductID = oi.ProductID
+GROUP BY p.Category
+HAVING SUM(oi.Quantity * oi.PriceAtOrder) > 50000;
+
+
+SELECT p.Category,
+       SUM(oi.Quantity * oi.PriceAtOrder) AS TotalSales
+FROM Products p
+JOIN OrderItems oi ON p.ProductID = oi.ProductID
+GROUP BY p.Category;
+
+
+UPDATE Products
+SET Price = ROUND(Price * 1.10, 2);
